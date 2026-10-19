@@ -4,6 +4,7 @@
 package resource
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -159,11 +160,12 @@ func extractXenDomID(cmdline []string) string {
 
 // generateVMID generates a VM ID when one can't be extracted
 func generateVMID(fullCmd string) string {
-	hash := fmt.Sprintf("%x", []byte(fullCmd))
-	if len(hash) > 16 {
-		return hash[:16]
+	if fullCmd == "" {
+		return ""
 	}
-	return hash
+
+	hash := sha256.Sum256([]byte(fullCmd))
+	return fmt.Sprintf("%x", hash[:8])
 }
 
 // vmNameFromCmdLine extracts VM name from command line arguments

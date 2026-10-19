@@ -469,11 +469,11 @@ func TestGenerateVMID(t *testing.T) {
 	}{{
 		name:     "Short command",
 		fullCmd:  "/usr/bin/qemu",
-		expected: "2f7573722f62696e",
+		expected: "6e465190516b5d68",
 	}, {
 		name:     "Long command gets truncated",
 		fullCmd:  "/usr/bin/qemu-system-x86_64 -name guest=test-vm -uuid 12345678-1234-5678-9abc-123456789abc",
-		expected: "2f7573722f62696e", // First 16 chars
+		expected: "1e96adb515dcf741",
 	}, {
 		name:     "Empty command",
 		fullCmd:  "",
@@ -486,6 +486,15 @@ func TestGenerateVMID(t *testing.T) {
 			assert.Equal(t, tc.expected, result)
 		})
 	}
+}
+
+func TestGenerateVMIDUsesFullCommand(t *testing.T) {
+	first := generateVMID("/usr/bin/qemu-system-x86_64 -name guest=vm-a")
+	second := generateVMID("/usr/bin/qemu-system-x86_64 -name guest=vm-b")
+
+	assert.NotEqual(t, first, second)
+	assert.Len(t, first, 16)
+	assert.Len(t, second, 16)
 }
 
 func TestVMInfoFromProc(t *testing.T) {
